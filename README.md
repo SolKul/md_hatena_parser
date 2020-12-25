@@ -13,6 +13,8 @@ md_parser.parse_md_to_hatena(pathlib.Pathオブジェクト)
 ## 注意
 うまくパースできなくても責任は取れないです。あくまでこういう事ができるという例です。
 
+現状大小記号がパース出来ません。
+
 ## 必要環境
 python3.8以上。`pathilib`、`markdown`モジュールを使います。
 
