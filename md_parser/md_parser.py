@@ -29,9 +29,20 @@ block_end=" }]</div>"
 # ブラケットの正規表現
 bracket_begin_pat=re.compile(r'\[')
 bracket_end_pat=re.compile(r'\]')
+# パース後のブラケット
+parsed_bracket_begin=r'\['
+parsed_bracket_end=r'\]'
+ 
 # 不等号の正規表現
 less_than_pat=re.compile(r'<')
-more_than_pat=re.compile(r'>')
+greater_than_pat=re.compile(r'>')
+# パース後の不等号
+# \\が2つなのに更にraw文字列としているのは、
+# もともと必要な\のエスケープに加え、
+# re.sub()のreple引数で使うので、
+# reple引数では\を解釈してしまうのでさらにそれをエスケープするため。
+parsed_less_than=r'\\lt '
+parsed_greater_than=r'\\gt '
 
 def parse_math_block(math_block):
     """
@@ -40,10 +51,12 @@ def parse_math_block(math_block):
     new_math_list=[block_begin]
     for i in range(1,len(math_block)-1):
         line=math_block[i].rstrip(os.linesep)
-        line=bracket_begin_pat.sub('\\[', line)
-        line=bracket_end_pat.sub('\\]', line)
-        line=less_than_pat.sub(' < ',line)
-        line=more_than_pat.sub(' > ',line)
+        # ブラケットをエスケープする
+        line=bracket_begin_pat.sub(parsed_bracket_begin, line)
+        line=bracket_end_pat.sub(parsed_bracket_end, line)
+        # 不等号をMathJax用不等号記号に
+        line=less_than_pat.sub(parsed_less_than,line)
+        line=greater_than_pat.sub(parsed_greater_than,line)
         line=re.sub(r'aligned',r'align',line)
         new_math_list.append(line)
     new_math_list.append(block_end)
@@ -51,12 +64,61 @@ def parse_math_block(math_block):
 
 # インライン環境の数式の正規表現
 inline_dollar_pat=re.compile(r'\$(.+?)\$')
+# ブラケットの正規表現
+bracket_begin_pat=re.compile(r'\[')
+bracket_end_pat=re.compile(r'\]')
+# 不等号の正規表現
+less_than_pat=re.compile(r'<')
+greater_than_pat=re.compile(r'>')
 # インライン環境の数式の始まりと終わり
-# \が4つなのは、もともと必要な\のエスケープに加え、
-# re.sub()のreple引数で使うので、
-# reple引数では\を解釈してしまうのでそれをエスケープするため。
-inline_begin="[tex:\\\\displaystyle{"
-inline_end="}]"
+inline_begin=r"[tex:\displaystyle{ "
+inline_end=" }]"
+ 
+class InlineMath:
+    """
+    標準ブロック中の一つ一つのインライン数式のクラス
+    元の数式と、標準ブロック中何番目のインライン数式かを引数にとる。
+    """
+    math_prefix="inline_math_"
+    
+    def __init__(self,inline_math_str,match_no):
+        self.inline_math_str=inline_math_str
+        self.match_no=match_no
+        
+        #「inline_math_数字」という文字列を作成する
+        self.rpl_str="{}{:0=4}".format(
+            type(self).math_prefix,
+            match_no)
+        
+        conv_math_str=inline_math_str
+
+        # ブラケットをエスケープする
+        conv_math_str=bracket_begin_pat.sub(parsed_bracket_begin, conv_math_str)
+        conv_math_str=bracket_end_pat.sub(parsed_bracket_end, conv_math_str)
+        # 不等号をMathJax用不等号記号に
+        conv_math_str=less_than_pat.sub(parsed_less_than,conv_math_str)
+        conv_math_str=greater_than_pat.sub(parsed_greater_than,conv_math_str)
+        
+        conv_math_str=inline_begin+conv_math_str+inline_end
+
+        self.conv_math_str=conv_math_str
+        
+    def sub_math_no(self,pre_parse_str):
+        # 「inline_math_数字」と置換する
+        return inline_dollar_pat.sub(
+            self.rpl_str,
+            pre_parse_str,
+            count=1)
+    
+    def sub_math_str(self,post_parse_str):
+        # 置換した「inline_math_数字」をパースした元のインライン数式で置換する。
+        return re.sub(
+            self.rpl_str,
+            repr(self.conv_math_str)[1:-1],
+            post_parse_str)
+
+# mdモジュールのパーサー(表変換機能付き)
+md_parser=md.Markdown(extensions=['tables'])
 
 # h2タグの始まりと終わり
 h3tag_begin_pat=re.compile(r"<h3>")
@@ -75,20 +137,39 @@ h3tag_end=r"</h3>"
 
 def parse_plain_block(plain_block):
     """
+    インライン数式を一旦退避させて、
     mdモジュールで変換した後、
-    インライン環境の数式をパースし、
-    h3タグをh4に、h2タグをh3にする。
+    退避させていたインライン数式を(はてな記法に変換した上で)
+    変換後の文字列に戻す。
     """
-    md_parser=md.Markdown(extensions=['tables'])
+    
+    # 標準ブロックをすべて結合し、文字列にする
+    plain_str="".join(plain_block)
+    # インライン数式をすべて探し、
+    #「inline_math_数字」と置換する。
+    match_results=inline_dollar_pat.findall(plain_str)
+    match_num=len(match_results)
+    parsing_math_list=[]
+    for i in range(match_num):
+        # InlineMathオブジェクトを生成する
+        parsing_math_list.append( InlineMath(
+            inline_math_str=match_results[i],
+            match_no=i) )
+        plain_str=parsing_math_list[-1].sub_math_no(plain_str)
 
-    parsed=md_parser.convert("".join(plain_block))
-    parsed=inline_dollar_pat.sub(inline_begin+r"\1"+inline_end,parsed)
+    # 数式を置換した文字列をmdモジュールでパースする。
+    parsed=md_parser.convert(plain_str)
     
     parsed=h3tag_begin_pat.sub(h4tag_begin,parsed)
     parsed=h3tag_end_pat.sub(h4tag_end,parsed)
     
     parsed=h2tag_begin_pat.sub(h3tag_begin,parsed)
     parsed=h2tag_end_pat.sub(h3tag_end,parsed)
+    
+    # 置換した「inline_math_数字」をパースした元のインライン数式で置換する。
+    for i in range(match_num):
+        parsed=parsing_math_list[i].sub_math_str(parsed)
+
     return parsed
 
 def classify_blocks(md_whole):
