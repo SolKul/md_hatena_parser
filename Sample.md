@@ -69,3 +69,7 @@ $$
 |  $l_z$ |  $m_l\hbar$  | $l_zY^m_l=m_l\hbar Y^m_l$ |
 |  $l_+$ |  なし  | $l_+Y^m_l=\hbar\sqrt{(l-m)(l+m+1)}Y^{m+1}_l$ |
 |  $l_-$ |  なし  | $l_-Y^m_l=\hbar\sqrt{(l+m)(l-m+1)}Y^{m-1}_l$ |
+
+|  $0<a$  |  $[a>0]$  |
+| ---- | ---- |
+|  $\sqrt{a>0}$  |  $[\omega^2]$  |

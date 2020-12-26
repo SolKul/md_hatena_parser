@@ -1,0 +1,60 @@
+<h3>数式テスト</h3>
+<p>ポテンシャルが[tex:\displaystyle{ r }]のみの関数(中心力場)で、定常状態の場合のシュレーディンガー方程式は、</p>
+<div align="center">[tex:\displaystyle{ \left\[    -\frac{\hbar^2}{2m}\nabla^2+V(r)\right\]\varphi(\pmb{r})=\varepsilon\varphi(\pmb{r})\tag{1} }]</div>
+<p>となる。ラプラシアン[tex:\displaystyle{ \nabla^2 }]は、球面極座標[tex:\displaystyle{ (r,\theta,\phi) }]では・・・</p>
+<h3>不等号テスト</h3>
+<p>[tex:\displaystyle{ 0\lt x\lt a }]にポテンシャルの壁がある場合の粒子の運動、トンネル効果について考える。</p>
+<div align="center">[tex:\displaystyle{ \begin{align}V(x)&=0\hspace{20pt}x\lt 0,\hspace{10pt}x\gt a\\V(x)&=V_0\hspace{17pt}0\lt x\lt a\end{align}\tag{1} }]</div>
+<h3>aligned環境テスト</h3>
+<p>クーロン場での動径方向のシュレーディンガー方程式の固有関数は</p>
+<div align="center">[tex:\displaystyle{ \begin{align}R_{1s}(r)&=\left(\frac{Z}{a_0}\right)^{\frac{3}{2}}2\mathrm{e}^{-Zr/a_0}\\\\R_{2s}(r)&=\left(\frac{Z}{a_0}\right)^{\frac{3}{2}}\frac{1}{\sqrt{2}}\left(1-\frac{1}{2}\frac{Zr}{a_0}\right)\mathrm{e}^{-Zr/2a_0}\\R_{2p}(r)&=\left(\frac{Z}{a_0}\right)^{\frac{3}{2}}\frac{1}{2\sqrt{6}}\frac{Zr}{a_0}\mathrm{e}^{-Zr/2a_0}\end{align} }]</div>
+<h3>array環境テスト</h3>
+<p>球面調和関数は</p>
+<div align="center">[tex:\displaystyle{ \begin{array}{ccl}l=0:&s:&Y^0_0=\frac{1}{\sqrt{4\pi}}\\\\l=1:&p0:&Y^0_1=\sqrt{\frac{3}{4\pi}}\cos\theta\\&p\pm1:&Y^{\pm1}_1=\mp\sqrt{\frac{3}{8\pi}}\sin\theta \mathrm{e}^{\pm i\phi}\end{array} }]</div>
+<h3>表テスト</h3>
+<p>角運動量[tex:\displaystyle{ \pmb{l} }]に結果を表にまとめると、</p>
+<table>
+<thead>
+<tr>
+<th>演算子</th>
+<th>固有値</th>
+<th>作用した結果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[tex:\displaystyle{ \pmb{l}^2 }]</td>
+<td>[tex:\displaystyle{ l(l+1)\hbar^2 }]</td>
+<td>[tex:\displaystyle{ \pmb{l}^2Y^m_l=l(l+1)\hbar^2Y^m_l }]</td>
+</tr>
+<tr>
+<td>[tex:\displaystyle{ l_z }]</td>
+<td>[tex:\displaystyle{ m_l\hbar }]</td>
+<td>[tex:\displaystyle{ l_zY^m_l=m_l\hbar Y^m_l }]</td>
+</tr>
+<tr>
+<td>[tex:\displaystyle{ l_+ }]</td>
+<td>なし</td>
+<td>[tex:\displaystyle{ l_+Y^m_l=\hbar\sqrt{(l-m)(l+m+1)}Y^{m+1}_l }]</td>
+</tr>
+<tr>
+<td>[tex:\displaystyle{ l_- }]</td>
+<td>なし</td>
+<td>[tex:\displaystyle{ l_-Y^m_l=\hbar\sqrt{(l+m)(l-m+1)}Y^{m-1}_l }]</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>[tex:\displaystyle{ 0\lt a }]</th>
+<th>[tex:\displaystyle{ \[a\gt 0\] }]</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[tex:\displaystyle{ \sqrt{a\gt 0} }]</td>
+<td>[tex:\displaystyle{ \[\omega^2\] }]</td>
+</tr>
+</tbody>
+</table>
