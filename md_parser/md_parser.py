@@ -25,10 +25,13 @@ def classfy_math_block(md_list,pos,end_pos):
 
 # ブロック環境の数式の始まりと終わり
 block_begin="<div align=\"center\">[tex:\displaystyle{ "
-block_end="}]</div>"
+block_end=" }]</div>"
 # ブラケットの正規表現
 bracket_begin_pat=re.compile(r'\[')
 bracket_end_pat=re.compile(r'\]')
+# 不等号の正規表現
+less_than_pat=re.compile(r'<')
+more_than_pat=re.compile(r'>')
 
 def parse_math_block(math_block):
     """
@@ -39,6 +42,8 @@ def parse_math_block(math_block):
         line=math_block[i].rstrip(os.linesep)
         line=bracket_begin_pat.sub('\\[', line)
         line=bracket_end_pat.sub('\\]', line)
+        line=less_than_pat.sub(' < ',line)
+        line=more_than_pat.sub(' > ',line)
         line=re.sub(r'aligned',r'align',line)
         new_math_list.append(line)
     new_math_list.append(block_end)
