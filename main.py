@@ -2,8 +2,9 @@ from pathlib import Path
 from md_parser import md_parser
 
 def main():
-    md_path=Path("Sample.md")
-    md_parser.parse_md_to_hatena(md_path)
+    # 実行ファイルと同じ階層にある"Sample.md"をパース
+    md_path=Path(__file__).parent / "Sample.md"
+    md_parser.parse_md_to_hatena(md_path,svg=False)
 
 if __name__ == "__main__":
     main()

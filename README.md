@@ -17,7 +17,7 @@ md_parser.parse_md_to_hatena(pathlib.Pathオブジェクト)
 python3.8以上。`pathilib`、`markdown`モジュールを使います。
 
 ## 例
-main.pyを実行すると`Sample.md`がパースされ、パースされた`Sample_hatena.txt`というファイルができるはずです。
+main.pyを実行すると`Sample.md`がパースされ、パースされた`Sample_hatena.html`というファイルができるはずです。
 
 ## 対応しているもの、していないもの
 
