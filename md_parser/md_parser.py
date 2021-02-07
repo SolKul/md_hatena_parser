@@ -3,12 +3,7 @@ import os,re
 import markdown as md
 import urllib.request
 
-# mathjax-nodeを使って
-# 数式をSVGに変換するnodeのURL
-url = 'http://localhost:8080/convert'
-headers = {
-    'Content-Type': 'text/plain',
-}
+from . import math_parser
 
 def classfy_math_block(md_list,pos,end_pos):
     """
@@ -31,144 +26,27 @@ def classfy_math_block(md_list,pos,end_pos):
         # $$が無い場合
         return None,pos
 
-# ブロック環境の数式の始まりと終わり
-block_begin="<div align=\"center\">[tex:\displaystyle{ "
-block_end=" }]</div>"
-# ブラケットの正規表現
-bracket_begin_pat=re.compile(r'\[')
-bracket_end_pat=re.compile(r'\]')
-# パース後のブラケット
-parsed_bracket_begin=r'\['
-parsed_bracket_end=r'\]'
-
-# svgの場合のブロック数式の始まりと終わり
-div_begin="<div align=\"center\">"
-div_end="</div>"
- 
-# 不等号の正規表現
-less_than_pat=re.compile(r'<')
-greater_than_pat=re.compile(r'>')
-# パース後の不等号
-# \\が2つなのに更にraw文字列としているのは、
-# もともと必要な\のエスケープに加え、
-# re.sub()のreple引数で使うので、
-# reple引数では\を解釈してしまうのでさらにそれをエスケープするため。
-parsed_less_than=r'\\lt '
-parsed_greater_than=r'\\gt '
-
-def parse_math_block(math_block,svg=False):
-    """
-    ブロック環境の数式をパースする。
-    """
-    if svg:
-        whole_mb="".join(math_block[1:-1])
-        req = urllib.request.Request(url,whole_mb.encode(),headers)
-        with urllib.request.urlopen(req) as res:
-            body=res.read().decode("utf-8")
-            parsed_math_block = \
-                div_begin + body + div_end
-             
-    else:
-        new_math_list=[block_begin]
-        for i in range(1,len(math_block)-1):
-            line=math_block[i].rstrip(os.linesep)
-            # ブラケットをエスケープする
-            line=bracket_begin_pat.sub(parsed_bracket_begin, line)
-            line=bracket_end_pat.sub(parsed_bracket_end, line)
-            # 不等号をMathJax用不等号記号に
-            line=less_than_pat.sub(parsed_less_than,line)
-            line=greater_than_pat.sub(parsed_greater_than,line)
-            line=re.sub(r'aligned',r'align',line)
-            new_math_list.append(line)
-        new_math_list.append(block_end)
-        parsed_math_block="".join(new_math_list)
-    return parsed_math_block
-
 # インライン環境の数式の正規表現
 inline_dollar_pat=re.compile(r'\$(.+?)\$')
-# ブラケットの正規表現
-bracket_begin_pat=re.compile(r'\[')
-bracket_end_pat=re.compile(r'\]')
-# 不等号の正規表現
-less_than_pat=re.compile(r'<')
-greater_than_pat=re.compile(r'>')
-# インライン環境の数式の始まりと終わり
-inline_begin=r"[tex:\displaystyle{ "
-inline_end=" }]"
- 
-class InlineMath:
-    """
-    標準ブロック中の一つ一つのインライン数式のクラス
-    元の数式と、標準ブロック中何番目のインライン数式かを引数にとる。
-    """
-    math_prefix="inline_math_"
-    
-    def __init__(
-            self,
-            inline_math_str,
-            match_no,
-            svg=False):
-        self.inline_math_str=inline_math_str
-        self.match_no=match_no
-        
-        #「inline_math_数字」という文字列を作成する
-        self.rpl_str="{}{:0=4}".format(
-            type(self).math_prefix,
-            match_no)
-
-        conv_math_str=inline_math_str
-        if svg:
-            req = urllib.request.Request(
-                url,
-                conv_math_str.encode(),
-                headers)
-            with urllib.request.urlopen(req) as res:
-                conv_math_str=res.read().decode("utf-8")
-        else:
-            # ブラケットをエスケープする
-            conv_math_str=bracket_begin_pat.sub(parsed_bracket_begin, conv_math_str)
-            conv_math_str=bracket_end_pat.sub(parsed_bracket_end, conv_math_str)
-            # 不等号をMathJax用不等号記号に
-            conv_math_str=less_than_pat.sub(parsed_less_than,conv_math_str)
-            conv_math_str=greater_than_pat.sub(parsed_greater_than,conv_math_str)
-            
-            conv_math_str=inline_begin+conv_math_str+inline_end
-
-        self.conv_math_str=conv_math_str
-        
-    def sub_math_no(self,pre_parse_str):
-        # 「inline_math_数字」と置換する
-        return inline_dollar_pat.sub(
-            self.rpl_str,
-            pre_parse_str,
-            count=1)
-    
-    def sub_math_str(self,post_parse_str):
-        # 置換した「inline_math_数字」をパースした元のインライン数式で置換する。
-        return re.sub(
-            self.rpl_str,
-            repr(self.conv_math_str)[1:-1],
-            post_parse_str)
 
 # mdモジュールのパーサー(表変換機能付き)
 md_parser=md.Markdown(extensions=['tables'])
 
-# h2タグの始まりと終わり
-h3tag_begin_pat=re.compile(r"<h3>")
-h3tag_end_pat=re.compile(r"</h3>")
-# h3タグの始まりと終わり
-h4tag_begin=r"<h4>"
-h4tag_end=r"</h4>"
+# # h2タグの始まりと終わり
+# h3tag_begin_pat=re.compile(r"<h3>")
+# h3tag_end_pat=re.compile(r"</h3>")
+# # h3タグの始まりと終わり
+# h4tag_begin=r"<h4>"
+# h4tag_end=r"</h4>"
 
-# h2タグの始まりと終わり
-h2tag_begin_pat=re.compile(r"<h2>")
-h2tag_end_pat=re.compile(r"</h2>")
-# h3タグの始まりと終わり
-h3tag_begin=r"<h3>"
-h3tag_end=r"</h3>"
+# # h2タグの始まりと終わり
+# h2tag_begin_pat=re.compile(r"<h2>")
+# h2tag_end_pat=re.compile(r"</h2>")
+# # h3タグの始まりと終わり
+# h3tag_begin=r"<h3>"
+# h3tag_end=r"</h3>"
 
-
-def parse_plain_block(plain_block,svg=False):
+def parse_plain_block(plain_block,style="default"):
     """
     インライン数式を一旦退避させて、
     mdモジュールで変換した後、
@@ -185,20 +63,20 @@ def parse_plain_block(plain_block,svg=False):
     parsing_math_list=[]
     for i in range(match_num):
         # InlineMathオブジェクトを生成する
-        parsing_math_list.append( InlineMath(
+        parsing_math_list.append( math_parser.InlineMath(
             inline_math_str=match_results[i],
             match_no=i,
-            svg=svg) )
+            style=style) )
         plain_str=parsing_math_list[-1].sub_math_no(plain_str)
 
     # 数式を置換した文字列をmdモジュールでパースする。
     parsed=md_parser.convert(plain_str)
     
-    parsed=h3tag_begin_pat.sub(h4tag_begin,parsed)
-    parsed=h3tag_end_pat.sub(h4tag_end,parsed)
+    # parsed=h3tag_begin_pat.sub(h4tag_begin,parsed)
+    # parsed=h3tag_end_pat.sub(h4tag_end,parsed)
     
-    parsed=h2tag_begin_pat.sub(h3tag_begin,parsed)
-    parsed=h2tag_end_pat.sub(h3tag_end,parsed)
+    # parsed=h2tag_begin_pat.sub(h3tag_begin,parsed)
+    # parsed=h2tag_end_pat.sub(h3tag_end,parsed)
     
     # 置換した「inline_math_数字」をパースした元のインライン数式で置換する。
     for i in range(match_num):
@@ -242,7 +120,7 @@ def classify_blocks(md_whole):
         pos+=1
     return md_block_list
 
-def parse_block_list(md_block_list,svg=False):
+def parse_block_list(md_block_list,style="default"):
     """
     ブロックのリストそれぞれをパースする
     """
@@ -250,13 +128,15 @@ def parse_block_list(md_block_list,svg=False):
 
     for block in md_block_list:
         if block[0] == "plain_block":
-            parsed_list.append( parse_plain_block(block[1],svg=svg))
+            parsed_list.append( parse_plain_block(block[1],style=style))
         elif block[0] == "math_block":
-            parsed_list.append( parse_math_block(block[1],svg=svg))
+            parsed_list.append( math_parser.parse_math_block(
+                block[1],
+                style=style))
     return parsed_list
 
         
-def parse_md_to_hatena(md_path,svg=False):
+def parse_md_to_hatena(md_path,style="default"):
     """
     pathlibのPathを受け取って、
     markdownをはてな記法にパースして、
@@ -268,7 +148,7 @@ def parse_md_to_hatena(md_path,svg=False):
     if md_whole is None:
         return None
     md_block_list=classify_blocks(md_whole)
-    parsed_list=parse_block_list(md_block_list,svg=svg)
+    parsed_list=parse_block_list(md_block_list,style=style)
 
     # 保存する
     hatena_path=Path(md_path.stem+"_hatena.html")
