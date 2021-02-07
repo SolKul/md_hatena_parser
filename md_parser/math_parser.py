@@ -172,6 +172,7 @@ def parse_default_inline(inline_math_str):
 
 def parse_katex_inline(math_str):
     # インライン環境の数式の始まりと終わり
+    # はてなキーワードの自動リンクを無効化
     inline_begin="[]$"
     inline_end="$[]"
 

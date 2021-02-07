@@ -3,12 +3,29 @@ markdownをはてなブログのはてな記法にパースするプログラム
 
 ```python
 from md_parser import md_parser
-md_parser.parse_md_to_hatena(pathlib.Pathオブジェクト)
+md_parser.parse_md_to_hatena(pathlib.Pathオブジェクト,style="default")
 ```
-## 動機
-はてなブログのmarkdownは数式をうまく扱えないし、Markdownはカスタマイズ性が低い。例えばMathJaxは重いので、将来的にはサーバーサイドで処理もしたい。将来はてなブログから移住するかもしれないし。でも一方プレビューしながら文章や数式を書きたいという欲望もある。そしてはてなブログのMarkdownプレビューは少し使いにくい。
 
-そこで、VSCodeのMarkdown Preview EnhancedでMarkdownをプレビューしながら文章や数式を書き、それをパースすることにしました。
+`style`でスタイルを指定できます。
+
+- デフォルトの`default`ははてなブログにそのまま数式を渡す形になります。はてなブログは数式の表示にGoogle Charts APIかMathJaxを使っているらしいです。これはかなり遅いです。
+- `katex`を指定すれば、KaTeXで高速にレンダリングしてくれるようになります。[KaTeXのテスト - 七誌の開発日記](https://7shi.hateblo.jp/entry/2018/07/28/231859)のコードをお借りしました。また、数式についてはてなキーワードの自動リンクを無効にするようにしているので、はてなキーワードの自動リンクに気を遣う必要はありません。
+- `svg`では`node`などで数式をSVGに変換してくれるサーバーを使えば、数式をSVG形式にします。私は[mathjax-node](https://github.com/mathjax/MathJax-node)を使ってました。ただ、SVGのソースが膨大になるのであまり実用的ではありません
+
+## 動機
+はてなブログのMarkdownは
+
+- 画面半々にしてプレビューできるがスクロールが同期しない
+- 数式がプレビューされない
+- 数式の記法がLaTeXの普通の記法と異なる(キャレット、アンダーバーなど)
+
+と使いづらいです。
+
+そこで、VSCodeの拡張機能の一つである`Markdown Preview Enhanced`でMarkdownをプレビューしながら文章や数式を書き、それをはてな流のMarkdownにパースすることにしました。これで数式を含むQiitaの記事をはてなブログに移植するのも楽になると思います。
+
+`Markdown Preview Enhanced`についてはこちら
+
+https://qiita.com/tamaki_osamu/items/b5785930a77d44bba59c
 
 ## 注意
 うまくパースできなくても責任は取れないです。あくまでこういう事ができるという例です。
