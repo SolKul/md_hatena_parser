@@ -12,6 +12,8 @@ md_parser.parse_md_to_hatena(pathlib.Pathオブジェクト,style="default")
 - `katex`を指定すれば、KaTeXで高速にレンダリングしてくれるようになります。[KaTeXのテスト - 七誌の開発日記](https://7shi.hateblo.jp/entry/2018/07/28/231859)のコードをお借りしました。また、数式についてはてなキーワードの自動リンクを無効にするようにしているので、はてなキーワードの自動リンクに気を遣う必要はありません。
 - `svg`では`node`などで数式をSVGに変換してくれるサーバーを使えば、数式をSVG形式にします。私は[mathjax-node](https://github.com/mathjax/MathJax-node)を使ってました。ただ、SVGのソースが膨大になるのであまり実用的ではありません
 
+レポジトリ内の`main.py`を実行すると`Sample.md`がパースされ、パースされた`Sample_hatena.html`というファイルができるはずです。
+
 ## 動機
 はてなブログのMarkdownは
 
@@ -21,7 +23,7 @@ md_parser.parse_md_to_hatena(pathlib.Pathオブジェクト,style="default")
 
 と使いづらいです。
 
-そこで、VSCodeの拡張機能の一つである`Markdown Preview Enhanced`でMarkdownをプレビューしながら文章や数式を書き、それをはてな流のMarkdownにパースすることにしました。これで数式を含むQiitaの記事をはてなブログに移植するのも楽になると思います。
+そこで、VSCodeの拡張機能の一つである`Markdown Preview Enhanced`でMarkdownをプレビューしながら文章や数式を書き、それをはてな記法のHTMLにパースすることにしました。
 
 `Markdown Preview Enhanced`についてはこちら
 
