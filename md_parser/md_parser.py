@@ -133,6 +133,30 @@ def parse_block_list(md_block_list,style="default"):
             parsed_list.append( math_parser.parse_math_block(
                 block[1],
                 style=style))
+    if style == "katex":
+        n7shi_script="""
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.css" integrity="sha384-bsHo4/LA+lkZv61JspMDQB9QP1TtO4IgOf2yYS+J6VdAYLVyx1c3XKcsHh0Vy8Ws" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.js" integrity="sha384-4z8mjH4yIpuK9dIQGR1JwbrfYsStrNK6MP+2Enhue4eyo0XlBDXOIPc8b6ZU0ajz" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  for (let e of Array.from(document.getElementsByClassName("math-render"))) {
+    if (!e.mathRendered) {
+      try {
+        katex.render(e.textContent, e, { displayMode: true });
+      } catch (ex) {
+        e.textContent = ex.message;
+      }
+      e.mathRendered = true;
+    }
+  }
+  let katexOptions = { delimiters: [{ left: "$", right: "$", display: false }] };
+  for (let e of Array.from(document.getElementsByClassName("entry-content"))) {
+    renderMathInElement(e, katexOptions);
+  }
+});
+</script>"""
+        parsed_list.append(n7shi_script)
     return parsed_list
 
         
