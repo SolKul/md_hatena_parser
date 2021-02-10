@@ -94,7 +94,7 @@ def classify_blocks(md_whole):
     # ブロックのリスト
     md_block_list=[]
     end_pos=len(md_whole)
-    for i in range(end_pos):
+    for i in range(end_pos+1):
         # 行数が最終行以降であれば、抜ける
         if pos >= end_pos:
             plain_block=md_whole[previous_pos:pos].copy()
