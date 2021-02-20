@@ -156,6 +156,29 @@ document.addEventListener("DOMContentLoaded", () => {
     renderMathInElement(e, katexOptions);
   }
 });
+</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tingle.js@0.15.2/dist/tingle.min.css">
+<script src="https://cdn.jsdelivr.net/npm/tingle.js@0.15.2/dist/tingle.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/nils-soderman/CtxMenu-Javascript@0.1.3/ctxmenu/ctxmenu.min.css">
+<script src="https://cdn.jsdelivr.net/gh/nils-soderman/CtxMenu-Javascript@0.1.3/ctxmenu/ctxmenu.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  let modal = new tingle.modal();
+  modal.setContent('<textarea readOnly rows="10" style="width:100%;resize:none;border:none;white-space:pre-wrap;"></textarea>');
+  modal.getContent().style.padding = "1rem 1rem";
+  CtxMenu(".katex").addItem("Show TeX Commands", e => {
+    let an = e.getElementsByTagName("annotation");
+    let text = an.length > 0 ? an[0].textContent : "???";
+    modal.getContent().firstChild.value = unescapeHTML(text.trim());
+    modal.open();
+  });
+});
+function unescapeHTML(s) {
+  return s
+    .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&")
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, p1) => String.fromCharCode(parseInt(p1, 16)));
+}
 </script>"""
         parsed_list.append(n7shi_script)
     return parsed_list
